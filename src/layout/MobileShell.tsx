@@ -8,7 +8,8 @@ export default function MobileShell(props: {
   totalCount: number;
   query: string;
   onChangeQuery: (v: string) => void;
-  onAdd: () => void;
+  onAdd?: () => void;
+  actionLabel?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -33,7 +34,11 @@ export default function MobileShell(props: {
               총 <b>{props.totalCount}</b>개의 단어 저장됨
             </Sub>
           </div>
-          <AddBtn onClick={props.onAdd}>+</AddBtn>
+          {props.onAdd ? (
+            <ActionBtn onClick={props.onAdd} hasLabel={Boolean(props.actionLabel)}>
+              {props.actionLabel ?? "+"}
+            </ActionBtn>
+          ) : null}
         </TitleRow>
 
         {props.children}
@@ -121,14 +126,18 @@ const Sub = styled.p`
   }
 `;
 
-const AddBtn = styled.button`
-  width: 44px;
+const ActionBtn = styled.button<{ hasLabel: boolean }>`
+  width: ${({ hasLabel }) => (hasLabel ? "auto" : "44px")};
+  min-width: 44px;
   height: 44px;
   border-radius: 14px;
   border: 0;
   background: ${({ theme }) => theme.color.blue};
   color: #fff;
-  font-size: 26px;
+  padding: ${({ hasLabel }) => (hasLabel ? "0 14px" : "0")};
+  font-size: ${({ hasLabel }) => (hasLabel ? "15px" : "26px")};
+  font-weight: 700;
   box-shadow: ${({ theme }) => theme.shadow.sm};
   cursor: pointer;
+  white-space: nowrap;
 `;

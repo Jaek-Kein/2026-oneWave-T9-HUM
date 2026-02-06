@@ -134,7 +134,6 @@ function App() {
   const shellProps = {
     query,
     onChangeQuery: setQuery,
-    onAdd: () => undefined,
   };
 
   return isMobile ? (
@@ -177,7 +176,7 @@ function App() {
       <HelpButton mobile>?</HelpButton>
     </MobileShell>
   ) : (
-    <WebShell userName="홍길동" {...shellProps}>
+    <WebShell userName="홍길동" onAdd={() => undefined} {...shellProps}>
       <Content>
         <HeaderRow>
           <div>
@@ -186,7 +185,6 @@ function App() {
               노래 가사에서 수집한 단어를 학습해보세요. 총 <b>{wordList.length}</b>개의 단어가 등록되어 있습니다.
             </Subtitle>
           </div>
-          <AddButton>+ 새 단어 추가하기</AddButton>
         </HeaderRow>
 
         <FilterRow>
@@ -295,20 +293,6 @@ const Subtitle = styled.p`
   b {
     color: ${({ theme }) => theme.color.blue};
   }
-`;
-
-const AddButton = styled.button`
-  border: 0;
-  border-radius: 10px;
-  background: ${({ theme }) => theme.color.blue};
-  color: #fff;
-  padding: 0 14px;
-  height: 38px;
-  font-size: 13px;
-  font-weight: 700;
-  box-shadow: ${({ theme }) => theme.shadow.sm};
-  cursor: pointer;
-  white-space: nowrap;
 `;
 
 const FilterRow = styled.div`

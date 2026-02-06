@@ -5,12 +5,13 @@ export default function TopSearchBar(props: {
   value: string;
   onChange: (value: string) => void;
   wide?: boolean;
+  placeholder?: string;
 }) {
   return (
     <SearchWrap wide={props.wide}>
       <FiSearch size={18} />
       <Input
-        placeholder="단어, 뜻, 또는 아티스트 검색..."
+        placeholder={props.placeholder ?? "곡명 또는 아티스트 검색"}
         value={props.value}
         onChange={(event) => props.onChange(event.target.value)}
       />

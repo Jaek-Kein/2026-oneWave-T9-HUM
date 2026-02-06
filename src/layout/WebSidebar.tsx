@@ -1,18 +1,38 @@
-import styled from "@emotion/styled";
+﻿import styled from "@emotion/styled";
+import type { ComponentType } from "react";
 import { FaItunesNote } from "react-icons/fa";
 import { FiBookOpen, FiHome, FiMusic, FiUser } from "react-icons/fi";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const menus = [
-  { id: "dashboard", label: "홈", icon: FiHome },
-  { id: "vocab", label: "단어장", icon: FiBookOpen, active: true },
-  { id: "track", label: "트랙 로그", icon: FiMusic },
+type Menu = {
+  id: "dashboard" | "vocab" | "track";
+  label: string;
+  icon: ComponentType<{ size?: number }>;
+  path: string;
+};
+
+const menus: Menu[] = [
+  { id: "dashboard", label: "대시보드", icon: FiHome, path: "/dashboard" },
+  { id: "vocab", label: "단어장", icon: FiBookOpen, path: "/words" },
+  { id: "track", label: "트랙 목록", icon: FiMusic, path: "/tracks" },
 ];
 
 export default function WebSidebar() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const isActive = (id: Menu["id"]) => {
+    if (id === "track") return pathname.startsWith("/tracks");
+    if (id === "vocab") return pathname.startsWith("/words");
+    return pathname.startsWith("/dashboard");
+  };
+
   return (
     <Wrap>
       <Header>
-        <Logo><FaItunesNote /></Logo>
+        <Logo>
+          <FaItunesNote />
+        </Logo>
         <Brand>Vinsign Vocab</Brand>
       </Header>
 
@@ -20,7 +40,12 @@ export default function WebSidebar() {
         {menus.map((menu) => {
           const Icon = menu.icon;
           return (
-            <NavItem key={menu.id} active={menu.active}>
+            <NavItem
+              key={menu.id}
+              active={isActive(menu.id)}
+              onClick={() => navigate(menu.path)}
+              type="button"
+            >
               <Icon size={20} />
               <span>{menu.label}</span>
             </NavItem>
@@ -33,7 +58,7 @@ export default function WebSidebar() {
           <FiUser size={18} />
           <span>마이페이지</span>
         </FooterItem>
-        <Logout>로그아웃</Logout>
+        <Logout type="button">로그아웃</Logout>
       </Footer>
     </Wrap>
   );

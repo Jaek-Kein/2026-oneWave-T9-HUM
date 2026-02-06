@@ -1,20 +1,44 @@
 import styled from "@emotion/styled";
+import type { ComponentType } from "react";
 import { FiBookOpen, FiHome, FiMusic, FiUser } from "react-icons/fi";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const menus = [
-  { id: "dashboard", label: "홈", icon: FiHome },
-  { id: "vocab", label: "단어장", icon: FiBookOpen, active: true },
-  { id: "track", label: "플레이리스트", icon: FiMusic },
-  { id: "my", label: "마이페이지", icon: FiUser },
+type Menu = {
+  id: "dashboard" | "vocab" | "track" | "profile";
+  label: string;
+  icon: ComponentType<{ size?: number }>;
+  path: string;
+};
+
+const menus: Menu[] = [
+  { id: "dashboard", label: "대시보드", icon: FiHome, path: "/dashboard" },
+  { id: "vocab", label: "단어장", icon: FiBookOpen, path: "/words" },
+  { id: "track", label: "트랙", icon: FiMusic, path: "/tracks" },
+  { id: "profile", label: "프로필", icon: FiUser, path: "/profile" },
 ];
 
 export default function MobileBottomNav() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const isActive = (id: Menu["id"]) => {
+    if (id === "track") return pathname.startsWith("/tracks");
+    if (id === "vocab") return pathname.startsWith("/words");
+    if (id === "dashboard") return pathname.startsWith("/dashboard");
+    return pathname.startsWith("/profile");
+  };
+
   return (
     <Wrap>
       {menus.map((menu) => {
         const Icon = menu.icon;
         return (
-          <Item key={menu.id} active={menu.active}>
+          <Item
+            key={menu.id}
+            active={isActive(menu.id)}
+            onClick={() => navigate(menu.path)}
+            type="button"
+          >
             <Icon size={20} />
             <span>{menu.label}</span>
           </Item>
@@ -48,4 +72,5 @@ const Item = styled.button<{ active?: boolean }>`
   gap: 4px;
   font-size: 11px;
   font-weight: ${({ active }) => (active ? 700 : 600)};
+  cursor: pointer;
 `;

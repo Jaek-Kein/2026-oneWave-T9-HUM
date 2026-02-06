@@ -21,6 +21,13 @@ type LyricsExample = {
   release: string;
 };
 
+type SynonymExample = {
+  id: number;
+  word: string;
+  meaning: string;
+  note: string;
+};
+
 type RelatedTrack = {
   id: number;
   title: string;
@@ -90,6 +97,26 @@ export default function WordDetailPage() {
     },
   ];
 
+  const synonymMap: Record<string, string[]> = {
+    serendipity: ["chance", "fortune", "fluke"],
+    euphoria: ["elation", "joy", "bliss"],
+    epiphany: ["insight", "realization", "revelation"],
+    persona: ["image", "identity", "character"],
+    lonely: ["solitary", "isolated", "lonesome"],
+    bloom: ["flourish", "blossom", "thrive"],
+    paradise: ["heaven", "utopia", "eden"],
+    unstoppable: ["invincible", "relentless", "untiring"],
+  };
+
+  const synonyms: SynonymExample[] = (
+    synonymMap[word.word.toLowerCase()] ?? ["similar", "related", "equivalent"]
+  ).map((item, idx) => ({
+    id: idx + 1,
+    word: item,
+    meaning: `${word.meaning}와(과) 유사한 뉘앙스`,
+    note: `${word.partOfSpeech} · 유의어`,
+  }));
+
   const relatedTracks: RelatedTrack[] = [
     {
       id: 1,
@@ -123,6 +150,28 @@ export default function WordDetailPage() {
       </WordRow>
       <Pronunciation>{pronunciation}</Pronunciation>
       <Meaning>{word.meaning}</Meaning>
+
+      <Section>
+        <SectionTitle>유의어</SectionTitle>
+        <ExampleList>
+          {synonyms.map((synonym) => (
+            <ExampleCard key={synonym.id}>
+              <Artwork />
+              <ExampleBody>
+                <ExampleMeta>
+                  <strong>{synonym.word}</strong>
+                  <span>{synonym.note}</span>
+                </ExampleMeta>
+                <ExampleLine>{highlightWord(synonym.meaning, word.word)}</ExampleLine>
+                <ExampleRelease>단어 기반 추천</ExampleRelease>
+              </ExampleBody>
+              <PlayButton>
+                <FiPlay size={14} />
+              </PlayButton>
+            </ExampleCard>
+          ))}
+        </ExampleList>
+      </Section>
 
       <Section>
         <SectionTitle>가사 예문</SectionTitle>
