@@ -5,7 +5,7 @@ import { FiBookOpen, FiHome, FiMusic, FiUser } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 
 type Menu = {
-  id: "dashboard" | "vocab" | "track";
+  id: "dashboard" | "vocab" | "track" | "profile";
   label: string;
   icon: ComponentType<{ size?: number }>;
   path: string;
@@ -14,7 +14,8 @@ type Menu = {
 const menus: Menu[] = [
   { id: "dashboard", label: "대시보드", icon: FiHome, path: "/dashboard" },
   { id: "vocab", label: "단어장", icon: FiBookOpen, path: "/words" },
-  { id: "track", label: "트랙 목록", icon: FiMusic, path: "/tracks" },
+  { id: "track", label: "트랙 로그", icon: FiMusic, path: "/tracks" },
+  { id: "profile", label: "프로필", icon: FiUser, path: "/profile" },
 ];
 
 export default function WebSidebar() {
@@ -24,6 +25,7 @@ export default function WebSidebar() {
   const isActive = (id: Menu["id"]) => {
     if (id === "track") return pathname.startsWith("/tracks");
     if (id === "vocab") return pathname.startsWith("/words");
+    if (id === "profile") return pathname.startsWith("/profile");
     return pathname.startsWith("/dashboard");
   };
 
@@ -54,7 +56,7 @@ export default function WebSidebar() {
       </Nav>
 
       <Footer>
-        <FooterItem>
+        <FooterItem onClick={() => navigate("/profile")} type="button">
           <FiUser size={18} />
           <span>마이페이지</span>
         </FooterItem>
@@ -123,12 +125,18 @@ const Footer = styled.div`
   color: #66748f;
 `;
 
-const FooterItem = styled.div`
+const FooterItem = styled.button`
+  border: 0;
+  background: transparent;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
   height: 42px;
   padding: 0 14px;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
 `;
 
 const Logout = styled.button`
