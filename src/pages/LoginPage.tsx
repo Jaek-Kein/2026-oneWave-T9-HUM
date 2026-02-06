@@ -47,9 +47,6 @@ export default function LoginPage() {
             <br />
             당신만의 학습 로그를 만들어보세요.
           </HeroText>
-          <FloatingNote top="13%" right="10%" />
-          <FloatingNote top="58%" right="11%" />
-          <FloatingNote top="28%" right="24%" />
         </Hero>
 
         <LoginPanel>
@@ -138,33 +135,6 @@ const Hero = styled.div`
   justify-content: flex-end;
   background: #041217;
 
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    left: -10%;
-    right: -10%;
-    border-radius: 40% 60% 45% 55%;
-    filter: blur(1px);
-    opacity: 0.75;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  &::before {
-    height: 160px;
-    bottom: 34%;
-    background: linear-gradient(90deg, rgba(11, 255, 208, 0.12), rgba(11, 255, 208, 0.72), rgba(11, 255, 208, 0.2));
-    transform: rotate(-6deg);
-  }
-
-  &::after {
-    height: 190px;
-    bottom: 22%;
-    background: linear-gradient(90deg, rgba(11, 255, 208, 0.18), rgba(11, 255, 208, 0.5), rgba(11, 255, 208, 0.2));
-    transform: rotate(4deg);
-  }
-
   @media (max-width: 860px) {
     border-radius: 0 0 30px 30px;
     padding: 36px 32px 28px;
@@ -240,23 +210,6 @@ const HeroText = styled.p`
   color: rgba(222, 255, 246, 0.84);
   font-size: clamp(20px, 2vw, 27px);
   line-height: 1.45;
-`;
-
-const FloatingNote = styled.div<{ top: string; right: string }>`
-  position: absolute;
-  top: ${({ top }) => top};
-  right: ${({ right }) => right};
-  width: clamp(14px, 3.1vw, 24px);
-  height: clamp(14px, 3.1vw, 24px);
-  opacity: 0.8;
-  border-radius: 999px;
-  background: linear-gradient(145deg, #29f9d3, #0ec89b);
-  box-shadow: 0 0 15px rgba(42, 251, 212, 0.7);
-
-  @media (max-width: 860px) {
-    width: 17px;
-    height: 17px;
-  }
 `;
 
 const LoginPanel = styled.div`
