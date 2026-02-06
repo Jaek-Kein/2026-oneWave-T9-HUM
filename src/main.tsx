@@ -3,13 +3,13 @@ import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@emotion/react";
 import { theme } from "./styles/theme";
 import GlobalStyle from "./styles/GlobalStyle";
-import App from "./App";
+import AppRouter from "./router/AppRouter";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <App />
+      <AppRouter />
     </ThemeProvider>
   </React.StrictMode>
 );

@@ -7,6 +7,7 @@ import {
   FiLoader,
   FiMusic,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import MobileShell from "./layout/MobileShell";
 import WebShell from "./layout/WebShell";
 import { useMediaQuery } from "./shared/hooks/useMediaQueryl";
@@ -27,6 +28,7 @@ const MOBILE_PAGE_SIZE = 3;
 
 function App() {
   const isMobile = useMediaQuery("(max-width: 1023px)");
+  const navigate = useNavigate();
   const [desktopPage, setDesktopPage] = useState(1);
   const [mobileVisibleCount, setMobileVisibleCount] = useState(MOBILE_PAGE_SIZE);
   const [mobileLoading, setMobileLoading] = useState(false);
@@ -153,7 +155,7 @@ function App() {
 
       <WordGrid mobile>
         {pageWords.map((item) => (
-          <WordCard key={item.id} item={item} mobile />
+          <WordCard key={item.id} item={item} mobile onClick={() => navigate(`/words/${item.id}`)} />
         ))}
       </WordGrid>
 
@@ -206,7 +208,7 @@ function App() {
 
         <WordGrid>
           {pageWords.map((item) => (
-            <WordCard key={item.id} item={item} />
+            <WordCard key={item.id} item={item} onClick={() => navigate(`/words/${item.id}`)} />
           ))}
         </WordGrid>
 
@@ -233,11 +235,11 @@ function App() {
   );
 }
 
-function WordCard(props: { item: WordItem; mobile?: boolean }) {
-  const { item, mobile = false } = props;
+function WordCard(props: { item: WordItem; mobile?: boolean; onClick?: () => void }) {
+  const { item, mobile = false, onClick } = props;
 
   return (
-    <Card mobile={mobile}>
+    <Card mobile={mobile} clickable={Boolean(onClick)} onClick={onClick}>
       <CardHead>
         <Word>{item.word}</Word>
         <Badge>{item.partOfSpeech}</Badge>
@@ -381,7 +383,7 @@ const WordGrid = styled.div<{ mobile?: boolean }>`
   }
 `;
 
-const Card = styled.article<{ mobile?: boolean }>`
+const Card = styled.article<{ mobile?: boolean; clickable?: boolean }>`
   position: relative;
   border-radius: 14px;
   background: ${({ theme }) => theme.color.surface};
@@ -389,6 +391,7 @@ const Card = styled.article<{ mobile?: boolean }>`
   box-shadow: ${({ theme }) => theme.shadow.sm};
   padding: ${({ mobile }) => (mobile ? "22px 20px" : "21px")};
   min-height: ${({ mobile }) => (mobile ? "208px" : "231px")};
+  cursor: ${({ clickable }) => (clickable ? "pointer" : "default")};
 `;
 
 const CardHead = styled.div`
@@ -565,3 +568,4 @@ const HelpButton = styled.button<{ mobile?: boolean }>`
 `;
 
 export default App;
+
