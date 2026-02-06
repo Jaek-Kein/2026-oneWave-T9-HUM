@@ -410,7 +410,7 @@ const Badge = styled.span`
   min-width: 42px;
   text-align: center;
   border-radius: 8px;
-  background: #eef5ff;
+  background: #e8fff5;
   color: ${({ theme }) => theme.color.blue};
   font-size: 18px;
   font-weight: 700;
@@ -419,7 +419,7 @@ const Badge = styled.span`
 
 const Meaning = styled.p`
   margin: 10px 0 15px;
-  color: #0058ff;
+  color: ${({ theme }) => theme.color.blue};
   font-size: 21px;
   font-weight: 700;
 `;
@@ -542,12 +542,12 @@ const SortLabel = styled.div`
 const SortTab = styled.button<{ active?: boolean }>`
   border: 0;
   background: transparent;
-  color: ${({ active }) => (active ? "#0058ff" : "#8994aa")};
+  color: ${({ theme, active }) => (active ? theme.color.blue : "#8994aa")};
   padding: 0 0 10px;
   font-size: 15px;
   font-weight: ${({ active }) => (active ? 700 : 600)};
   border-bottom: 3px solid
-    ${({ active }) => (active ? "#0058ff" : "transparent")};
+    ${({ theme, active }) => (active ? theme.color.blue : "transparent")};
   margin-bottom: -1px;
   cursor: pointer;
 `;

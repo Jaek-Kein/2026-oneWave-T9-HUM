@@ -70,7 +70,7 @@ const Logo = styled.div`
   width: 30px;
   height: 30px;
   border-radius: 9px;
-  background: linear-gradient(145deg, #1a65ff, #0058ff);
+  background: linear-gradient(145deg, #18b67a, #008f5a);
   display: grid;
   place-items: center;
   color: #fff;

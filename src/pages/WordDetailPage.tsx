@@ -95,15 +95,15 @@ export default function WordDetailPage() {
       id: 1,
       title: "Happy Accident",
       artist: "Brent Morgan",
-      colorA: "#0498FF",
-      colorB: "#153DAB",
+      colorA: "#23c483",
+      colorB: "#008f5a",
     },
     {
       id: 2,
       title: "Lucky Find",
       artist: "Sofia Clare",
-      colorA: "#FF7E5F",
-      colorB: "#2F1B34",
+      colorA: "#57d7a8",
+      colorB: "#1f8a63",
     },
   ];
 
@@ -422,7 +422,7 @@ const Artwork = styled.div`
   width: 100%;
   aspect-ratio: 1;
   border-radius: 12px;
-  background: radial-gradient(circle at 20% 20%, #fff2d9, #d9f4ff 58%, #bee7ff);
+  background: radial-gradient(circle at 20% 20%, #effff7, #d8f8eb 58%, #bdeed9);
 `;
 
 const ExampleBody = styled.div`

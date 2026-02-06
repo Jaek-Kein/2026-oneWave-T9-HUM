@@ -58,7 +58,7 @@ const Logo = styled.div`
   width: 36px;
   height: 36px;
   border-radius: 11px;
-  background: linear-gradient(145deg, #1a65ff, #0058ff);
+  background: linear-gradient(145deg, #18b67a, #008f5a);
   color: #fff;
   display: grid;
   place-items: center;
@@ -82,7 +82,7 @@ const NavItem = styled.button<{ active?: boolean }>`
   height: 48px;
   border: 0;
   border-radius: 12px;
-  background: ${({ active }) => (active ? "#edf4ff" : "transparent")};
+  background: ${({ active }) => (active ? "#e8fff5" : "transparent")};
   color: ${({ theme, active }) => (active ? theme.color.blue : "#647089")};
   padding: 0 14px;
   display: flex;
