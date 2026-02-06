@@ -58,13 +58,13 @@ export default function WordDetailPage() {
   const navigate = useNavigate();
   const { wordId } = useParams();
 
-  const { wordList, fetchWordList } = useWordStore();
+  const { wordList, fetchAppData } = useWordStore();
 
   useEffect(() => {
     if (wordList.length === 0) {
-      fetchWordList();
+      fetchAppData();
     }
-  }, [fetchWordList, wordList.length]);
+  }, [fetchAppData, wordList.length]);
 
   const word = useMemo(
     () => wordList.find((item) => String(item.id) === wordId),
@@ -621,3 +621,4 @@ const FloatingHelp = styled.button`
   font-size: 28px;
   font-weight: 800;
 `;
+

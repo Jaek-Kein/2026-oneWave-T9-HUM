@@ -88,7 +88,6 @@
       "addedAt": "2024.07",
       "language": "ENGLISH"
     },
-
     {
       "id": 9,
       "word": "愛",
@@ -177,7 +176,6 @@
       "addedAt": "2024.09",
       "language": "JAPANESE"
     },
-
     {
       "id": 17,
       "word": "사랑",
@@ -266,5 +264,90 @@
       "addedAt": "2024.08",
       "language": "KOREAN"
     }
-  ]
+  ],
+  "tracks": [
+    {
+      "id": 1,
+      "title": "Winter Bear",
+      "artist": "V",
+      "capturedAt": "2025.03.15 14:20",
+      "extractedWords": 8,
+      "source": "https://youtube.com/watch?v=xjV2...",
+      "platform": "youtube",
+      "coverStart": "#4f93c4",
+      "coverEnd": "#daeefe"
+    },
+    {
+      "id": 2,
+      "title": "Invisible String",
+      "artist": "Taylor Swift",
+      "capturedAt": "2025.03.12 09:45",
+      "extractedWords": 12,
+      "source": "https://open.spotify.com/track/6...",
+      "platform": "spotify",
+      "coverStart": "#0a2d1f",
+      "coverEnd": "#5a7268"
+    },
+    {
+      "id": 3,
+      "title": "Flowers",
+      "artist": "Miley Cyrus",
+      "capturedAt": "2025.03.10 18:15",
+      "extractedWords": 5,
+      "source": "https://music.apple.com/us/album/...",
+      "platform": "apple",
+      "coverStart": "#2463ff",
+      "coverEnd": "#cf68ff"
+    },
+    {
+      "id": 4,
+      "title": "As It Was",
+      "artist": "Harry Styles",
+      "capturedAt": "2025.03.05 11:30",
+      "extractedWords": 15,
+      "source": "https://youtube.com/watch?v=h5v3L...",
+      "platform": "youtube",
+      "coverStart": "#f8f2e4",
+      "coverEnd": "#fefcf6"
+    },
+    {
+      "id": 5,
+      "title": "Die For You",
+      "artist": "The Weeknd",
+      "capturedAt": "2025.03.01 12:10",
+      "extractedWords": 9,
+      "source": "https://open.spotify.com/track/2...",
+      "platform": "spotify",
+      "coverStart": "#0f1118",
+      "coverEnd": "#2a2f39"
+    },
+    {
+      "id": 6,
+      "title": "Midnight Sky",
+      "artist": "Miley Cyrus",
+      "capturedAt": "2025.02.25 15:40",
+      "extractedWords": 7,
+      "source": "https://music.apple.com/us/album/...",
+      "platform": "apple",
+      "coverStart": "#10277a",
+      "coverEnd": "#d5238a"
+    }
+  ],
+  "user": {
+    "name": "???",
+    "avatarText": "?"
+  },
+  "dashboard": {
+    "greetingName": "??",
+    "totalWords": 24,
+    "totalTracks": 6
+  },
+  "profile": {
+    "email": "jihun@example.com",
+    "level": "Intermediate",
+    "streakDays": 19,
+    "favoriteLanguage": "ENGLISH",
+    "totalCapturedWords": 24,
+    "totalCapturedTracks": 6
+  }
 }

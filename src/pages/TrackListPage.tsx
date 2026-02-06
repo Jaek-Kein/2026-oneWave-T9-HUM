@@ -4,91 +4,9 @@ import { FiChevronDown, FiChevronLeft, FiChevronsRight, FiList } from "react-ico
 import MobileShell from "../layout/MobileShell";
 import WebShell from "../layout/WebShell";
 import { useMediaQuery } from "../shared/hooks/useMediaQueryl";
+import { useWordStore } from "../store/useWordStore";
 
 type Platform = "youtube" | "spotify" | "apple";
-type PlatformFilter = "ALL" | "YOUTUBE" | "SPOTIFY" | "APPLE";
-type SortType = "latest" | "title" | "words";
-
-type Track = {
-  id: number;
-  title: string;
-  artist: string;
-  capturedAt: string;
-  extractedWords: number;
-  source: string;
-  platform: Platform;
-  coverStart: string;
-  coverEnd: string;
-};
-
-const TRACKS: Track[] = [
-  {
-    id: 1,
-    title: "Winter Bear",
-    artist: "V",
-    capturedAt: "2025.03.15 14:20",
-    extractedWords: 8,
-    source: "https://youtube.com/watch?v=xjV2...",
-    platform: "youtube",
-    coverStart: "#4f93c4",
-    coverEnd: "#daeefe",
-  },
-  {
-    id: 2,
-    title: "Invisible String",
-    artist: "Taylor Swift",
-    capturedAt: "2025.03.12 09:45",
-    extractedWords: 12,
-    source: "https://open.spotify.com/track/6...",
-    platform: "spotify",
-    coverStart: "#0a2d1f",
-    coverEnd: "#5a7268",
-  },
-  {
-    id: 3,
-    title: "Flowers",
-    artist: "Miley Cyrus",
-    capturedAt: "2025.03.10 18:15",
-    extractedWords: 5,
-    source: "https://music.apple.com/us/album/...",
-    platform: "apple",
-    coverStart: "#2463ff",
-    coverEnd: "#cf68ff",
-  },
-  {
-    id: 4,
-    title: "As It Was",
-    artist: "Harry Styles",
-    capturedAt: "2025.03.05 11:30",
-    extractedWords: 15,
-    source: "https://youtube.com/watch?v=h5v3L...",
-    platform: "youtube",
-    coverStart: "#f8f2e4",
-    coverEnd: "#fefcf6",
-  },
-  {
-    id: 5,
-    title: "Die For You",
-    artist: "The Weeknd",
-    capturedAt: "2025.03.01 12:10",
-    extractedWords: 9,
-    source: "https://open.spotify.com/track/2...",
-    platform: "spotify",
-    coverStart: "#0f1118",
-    coverEnd: "#2a2f39",
-  },
-  {
-    id: 6,
-    title: "Midnight Sky",
-    artist: "Miley Cyrus",
-    capturedAt: "2025.02.25 15:40",
-    extractedWords: 7,
-    source: "https://music.apple.com/us/album/...",
-    platform: "apple",
-    coverStart: "#10277a",
-    coverEnd: "#d5238a",
-  },
-];
 
 const MOBILE_PAGE_SIZE = 4;
 const DESKTOP_PAGE_SIZE = 6;
@@ -96,45 +14,33 @@ const DESKTOP_PAGE_SIZE = 6;
 export default function TrackListPage() {
   const isMobile = useMediaQuery("(max-width: 1023px)");
   const [query, setQuery] = useState("");
-  const [platformFilter, setPlatformFilter] = useState<PlatformFilter>("ALL");
-  const [sortType, setSortType] = useState<SortType>("latest");
   const [desktopPage, setDesktopPage] = useState(1);
   const [mobileVisibleCount, setMobileVisibleCount] = useState(MOBILE_PAGE_SIZE);
 
-  const visibleTracks = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
+  const {
+    trackList,
+    user,
+    trackPlatformFilter,
+    trackSortType,
+    setTrackPlatformFilter,
+    setTrackSortType,
+    fetchAppData,
+    getFilteredTracks,
+  } = useWordStore();
 
-    let filtered = normalized
-      ? TRACKS.filter(
-          (track) =>
-            track.title.toLowerCase().includes(normalized) ||
-            track.artist.toLowerCase().includes(normalized),
-        )
-      : TRACKS;
+  useEffect(() => {
+    fetchAppData();
+  }, [fetchAppData]);
 
-    if (platformFilter !== "ALL") {
-      filtered = filtered.filter((track) => {
-        if (platformFilter === "YOUTUBE") return track.platform === "youtube";
-        if (platformFilter === "SPOTIFY") return track.platform === "spotify";
-        return track.platform === "apple";
-      });
-    }
-
-    if (sortType === "title") {
-      return [...filtered].sort((a, b) => a.title.localeCompare(b.title));
-    }
-
-    if (sortType === "words") {
-      return [...filtered].sort((a, b) => b.extractedWords - a.extractedWords);
-    }
-
-    return [...filtered].sort((a, b) => b.capturedAt.localeCompare(a.capturedAt));
-  }, [platformFilter, query, sortType]);
+  const visibleTracks = useMemo(
+    () => getFilteredTracks(query),
+    [getFilteredTracks, query, trackList, trackPlatformFilter, trackSortType],
+  );
 
   useEffect(() => {
     setDesktopPage(1);
     setMobileVisibleCount(MOBILE_PAGE_SIZE);
-  }, [query, platformFilter, sortType, isMobile]);
+  }, [query, trackPlatformFilter, trackSortType, isMobile]);
 
   const totalDesktopPages = Math.max(1, Math.ceil(visibleTracks.length / DESKTOP_PAGE_SIZE));
   const safeDesktopPage = Math.min(desktopPage, totalDesktopPages);
@@ -147,25 +53,39 @@ export default function TrackListPage() {
   const shellProps = {
     query,
     onChangeQuery: setQuery,
-    onAdd: () => setSortType((prev) => (prev === "latest" ? "words" : prev === "words" ? "title" : "latest")),
+    onAdd: () =>
+      setTrackSortType((prev) =>
+        prev === "latest" ? "words" : prev === "words" ? "title" : "latest",
+      ),
   };
 
   return isMobile ? (
-    <MobileShell title="최근 캡처된 곡" totalCount={visibleTracks.length} actionLabel={sortType === "latest" ? "최신순" : sortType === "words" ? "단어수" : "제목순"} {...shellProps}>
+    <MobileShell
+      title="최근 캡처된 곡"
+      totalCount={visibleTracks.length}
+      actionLabel={
+        trackSortType === "latest"
+          ? "최신순"
+          : trackSortType === "words"
+            ? "단어수"
+            : "제목순"
+      }
+      {...shellProps}
+    >
       <MobileToolbar>
-        <Chip active={platformFilter === "ALL"} onClick={() => setPlatformFilter("ALL")}>전체</Chip>
-        <Chip active={platformFilter === "YOUTUBE"} onClick={() => setPlatformFilter("YOUTUBE")}>YouTube</Chip>
-        <Chip active={platformFilter === "SPOTIFY"} onClick={() => setPlatformFilter("SPOTIFY")}>Spotify</Chip>
-        <Chip active={platformFilter === "APPLE"} onClick={() => setPlatformFilter("APPLE")}>Apple</Chip>
+        <Chip active={trackPlatformFilter === "ALL"} onClick={() => setTrackPlatformFilter("ALL")}>전체</Chip>
+        <Chip active={trackPlatformFilter === "YOUTUBE"} onClick={() => setTrackPlatformFilter("YOUTUBE")}>YouTube</Chip>
+        <Chip active={trackPlatformFilter === "SPOTIFY"} onClick={() => setTrackPlatformFilter("SPOTIFY")}>Spotify</Chip>
+        <Chip active={trackPlatformFilter === "APPLE"} onClick={() => setTrackPlatformFilter("APPLE")}>Apple</Chip>
       </MobileToolbar>
 
       <MobileSortTabs>
         <SortLabel>
           <FiList size={14} /> SORT BY
         </SortLabel>
-        <SortTab active={sortType === "latest"} onClick={() => setSortType("latest")}>최신순</SortTab>
-        <SortTab active={sortType === "words"} onClick={() => setSortType("words")}>단어수</SortTab>
-        <SortTab active={sortType === "title"} onClick={() => setSortType("title")}>제목순</SortTab>
+        <SortTab active={trackSortType === "latest"} onClick={() => setTrackSortType("latest")}>최신순</SortTab>
+        <SortTab active={trackSortType === "words"} onClick={() => setTrackSortType("words")}>단어수</SortTab>
+        <SortTab active={trackSortType === "title"} onClick={() => setTrackSortType("title")}>제목순</SortTab>
       </MobileSortTabs>
 
       <TrackList mobile>
@@ -202,7 +122,7 @@ export default function TrackListPage() {
       </Pagination>
     </MobileShell>
   ) : (
-    <WebShell userName="홍길동" {...shellProps}>
+    <WebShell userName={user.name} {...shellProps}>
       <Content>
         <HeaderRow>
           <div>
@@ -214,10 +134,12 @@ export default function TrackListPage() {
           <HeaderSortButton
             type="button"
             onClick={() =>
-              setSortType((prev) => (prev === "latest" ? "words" : prev === "words" ? "title" : "latest"))
+              setTrackSortType((prev) =>
+                prev === "latest" ? "words" : prev === "words" ? "title" : "latest",
+              )
             }
           >
-            <span>{sortType === "latest" ? "최신순" : sortType === "words" ? "단어수" : "제목순"}</span>
+            <span>{trackSortType === "latest" ? "최신순" : trackSortType === "words" ? "단어수" : "제목순"}</span>
             <FiChevronDown size={16} />
           </HeaderSortButton>
         </HeaderRow>
@@ -225,10 +147,10 @@ export default function TrackListPage() {
         <FilterRow>
           <FilterGroup>
             <FilterTitle>플랫폼</FilterTitle>
-            <Chip active={platformFilter === "ALL"} onClick={() => setPlatformFilter("ALL")}>전체</Chip>
-            <Chip active={platformFilter === "YOUTUBE"} onClick={() => setPlatformFilter("YOUTUBE")}>YouTube</Chip>
-            <Chip active={platformFilter === "SPOTIFY"} onClick={() => setPlatformFilter("SPOTIFY")}>Spotify</Chip>
-            <Chip active={platformFilter === "APPLE"} onClick={() => setPlatformFilter("APPLE")}>Apple</Chip>
+            <Chip active={trackPlatformFilter === "ALL"} onClick={() => setTrackPlatformFilter("ALL")}>전체</Chip>
+            <Chip active={trackPlatformFilter === "YOUTUBE"} onClick={() => setTrackPlatformFilter("YOUTUBE")}>YouTube</Chip>
+            <Chip active={trackPlatformFilter === "SPOTIFY"} onClick={() => setTrackPlatformFilter("SPOTIFY")}>Spotify</Chip>
+            <Chip active={trackPlatformFilter === "APPLE"} onClick={() => setTrackPlatformFilter("APPLE")}>Apple</Chip>
           </FilterGroup>
         </FilterRow>
 

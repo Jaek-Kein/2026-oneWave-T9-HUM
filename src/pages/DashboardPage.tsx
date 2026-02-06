@@ -1,8 +1,10 @@
+﻿import { useEffect, useMemo } from "react";
 import styled from "@emotion/styled";
 import { FiBookOpen, FiHome, FiMusic, FiUser } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMediaQuery } from "../shared/hooks/useMediaQueryl";
 import WebSidebar from "../layout/WebSidebar";
+import { useWordStore } from "../store/useWordStore";
 
 type NavItem = {
   id: "dashboard" | "words" | "tracks" | "profile";
@@ -32,18 +34,6 @@ const NAV_ITEMS: NavItem[] = [
   { id: "profile", label: "프로필", path: "/profile", icon: FiUser },
 ];
 
-const RECENT_WORDS: WordCard[] = [
-  { id: 1, word: "Serendipity", meaning: "뜻밖의 행운", partOfSpeech: "명사" },
-  { id: 2, word: "Euphoria", meaning: "행복감, 희열", partOfSpeech: "명사" },
-  { id: 3, word: "Nostalgia", meaning: "그리움, 향수", partOfSpeech: "명사" },
-];
-
-const RECENT_TRACKS: TrackCard[] = [
-  { id: 1, title: "Winter Bear", artist: "V", artwork: "linear-gradient(145deg, #73a8cf, #d8ebfb)" },
-  { id: 2, title: "Invisible String", artist: "Taylor Swift", artwork: "linear-gradient(145deg, #15272e, #4f6c66)" },
-  { id: 3, title: "As It Was", artist: "Harry Styles", artwork: "linear-gradient(145deg, #f3e8d6, #fff9ef)" },
-];
-
 export default function DashboardPage() {
   const isMobile = useMediaQuery("(max-width: 1023px)");
 
@@ -51,6 +41,34 @@ export default function DashboardPage() {
 }
 
 function DesktopDashboard() {
+  const { user, dashboard, fetchAppData, getDashboardRecentWords, getDashboardRecentTracks } = useWordStore();
+
+  useEffect(() => {
+    fetchAppData();
+  }, [fetchAppData]);
+
+  const recentWords: WordCard[] = useMemo(
+    () =>
+      getDashboardRecentWords(3).map((item) => ({
+        id: item.id,
+        word: item.word,
+        meaning: item.meaning,
+        partOfSpeech: item.partOfSpeech,
+      })),
+    [getDashboardRecentWords],
+  );
+
+  const recentTracks: TrackCard[] = useMemo(
+    () =>
+      getDashboardRecentTracks(3).map((track) => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        artwork: `linear-gradient(145deg, ${track.coverStart}, ${track.coverEnd})`,
+      })),
+    [getDashboardRecentTracks],
+  );
+
   return (
     <DesktopLayout>
       <WebSidebar />
@@ -58,14 +76,14 @@ function DesktopDashboard() {
         <DesktopTopbar>
           <HeaderSpacer />
           <UserArea>
-            <UserName>김민수님</UserName>
-            <Avatar aria-hidden>김</Avatar>
+            <UserName>{user.name}</UserName>
+            <Avatar aria-hidden>{user.avatarText}</Avatar>
           </UserArea>
         </DesktopTopbar>
 
         <DesktopContent>
           <Greeting>
-            반가워요, 지닌님! <span>👋</span>
+            반갑습니다, {dashboard.greetingName}님! <span>👋</span>
           </Greeting>
           <Title>오늘의 학습 대시보드</Title>
 
@@ -75,18 +93,18 @@ function DesktopDashboard() {
                 <StatIcon tone="blue">
                   <FiBookOpen size={17} />
                 </StatIcon>
-                <StatLabel>수집한 단어</StatLabel>
+                <StatLabel>수집된 단어</StatLabel>
               </StatHead>
-              <StatValue>342</StatValue>
+              <StatValue>{dashboard.totalWords}</StatValue>
             </StatCard>
             <StatCard>
               <StatHead>
                 <StatIcon tone="orange">
                   <FiMusic size={17} />
                 </StatIcon>
-                <StatLabel>수집한 트랙</StatLabel>
+                <StatLabel>수집된 트랙</StatLabel>
               </StatHead>
-              <StatValue>48</StatValue>
+              <StatValue>{dashboard.totalTracks}</StatValue>
             </StatCard>
           </StatGrid>
 
@@ -97,7 +115,7 @@ function DesktopDashboard() {
             </SectionHead>
 
             <DesktopWordGrid>
-              {RECENT_WORDS.map((item) => (
+              {recentWords.map((item) => (
                 <WordCardBox key={item.id}>
                   <WordTop>
                     <WordName>{item.word}</WordName>
@@ -116,7 +134,7 @@ function DesktopDashboard() {
             </SectionHead>
 
             <TrackList>
-              {RECENT_TRACKS.map((item) => (
+              {recentTracks.map((item) => (
                 <TrackRow key={item.id}>
                   <TrackCore>
                     <TrackArt style={{ background: item.artwork }} />
@@ -138,6 +156,33 @@ function DesktopDashboard() {
 function MobileDashboard() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { user, dashboard, fetchAppData, getDashboardRecentWords, getDashboardRecentTracks } = useWordStore();
+
+  useEffect(() => {
+    fetchAppData();
+  }, [fetchAppData]);
+
+  const recentWords: WordCard[] = useMemo(
+    () =>
+      getDashboardRecentWords(2).map((item) => ({
+        id: item.id,
+        word: item.word,
+        meaning: item.meaning,
+        partOfSpeech: item.partOfSpeech,
+      })),
+    [getDashboardRecentWords],
+  );
+
+  const recentTracks: TrackCard[] = useMemo(
+    () =>
+      getDashboardRecentTracks(2).map((track) => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        artwork: `linear-gradient(145deg, ${track.coverStart}, ${track.coverEnd})`,
+      })),
+    [getDashboardRecentTracks],
+  );
 
   const isActive = (id: NavItem["id"]) => {
     if (id === "words") return pathname.startsWith("/words");
@@ -152,11 +197,11 @@ function MobileDashboard() {
         <MobileHeader>
           <div>
             <Greeting>
-              반가워요, 지닌님! <span>👋</span>
+              반갑습니다, {dashboard.greetingName}님! <span>👋</span>
             </Greeting>
             <Title mobile>오늘의 학습 대시보드</Title>
           </div>
-          <Avatar aria-hidden>김</Avatar>
+          <Avatar aria-hidden>{user.avatarText}</Avatar>
         </MobileHeader>
 
         <MobileStatGrid>
@@ -165,18 +210,18 @@ function MobileDashboard() {
               <StatIcon tone="blue">
                 <FiBookOpen size={16} />
               </StatIcon>
-              <StatLabel>수집한 단어</StatLabel>
+              <StatLabel>수집된 단어</StatLabel>
             </StatHead>
-            <StatValue mobile>342</StatValue>
+            <StatValue mobile>{dashboard.totalWords}</StatValue>
           </StatCard>
           <StatCard>
             <StatHead>
               <StatIcon tone="orange">
                 <FiMusic size={16} />
               </StatIcon>
-              <StatLabel>수집한 트랙</StatLabel>
+              <StatLabel>수집된 트랙</StatLabel>
             </StatHead>
-            <StatValue mobile>48</StatValue>
+            <StatValue mobile>{dashboard.totalTracks}</StatValue>
           </StatCard>
         </MobileStatGrid>
 
@@ -186,7 +231,7 @@ function MobileDashboard() {
             <ViewAllLink href="#">전체보기</ViewAllLink>
           </SectionHead>
           <MobileWordList>
-            {RECENT_WORDS.slice(0, 2).map((item) => (
+            {recentWords.map((item) => (
               <WordCardBox key={item.id}>
                 <WordTop>
                   <WordName>{item.word}</WordName>
@@ -204,7 +249,7 @@ function MobileDashboard() {
             <ViewAllLink href="#">전체보기</ViewAllLink>
           </SectionHead>
           <TrackList>
-            {RECENT_TRACKS.slice(0, 2).map((item) => (
+            {recentTracks.map((item) => (
               <TrackRow key={item.id}>
                 <TrackCore>
                   <TrackArt style={{ background: item.artwork }} />

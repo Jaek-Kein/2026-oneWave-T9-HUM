@@ -40,16 +40,17 @@ function App() {
     query,
     sortType,
     language,
+    user,
     setQuery,
     setSortType,
     setLanguage,
-    fetchWordList,
+    fetchAppData,
     getFilteredWords,
   } = useWordStore();
 
   useEffect(() => {
-    fetchWordList();
-  }, [fetchWordList]);
+    fetchAppData();
+  }, [fetchAppData]);
 
   const visibleWords = useMemo(
     () => getFilteredWords(),
@@ -141,6 +142,8 @@ function App() {
       <MobileToolbar>
         <Chip active={language === "ALL"} onClick={() => setLanguage("ALL")}>전체</Chip>
         <Chip active={language === "ENGLISH"} onClick={() => setLanguage("ENGLISH")}>영어</Chip>
+        <Chip active={language === "JAPANESE"} onClick={() => setLanguage("JAPANESE")}>일본어</Chip>
+        <Chip active={language === "KOREAN"} onClick={() => setLanguage("KOREAN")}>한국어</Chip>
       </MobileToolbar>
 
       <MobileSortTabs>
@@ -176,7 +179,7 @@ function App() {
       <HelpButton mobile>?</HelpButton>
     </MobileShell>
   ) : (
-    <WebShell userName="홍길동" onAdd={() => undefined} {...shellProps}>
+    <WebShell userName={user.name} onAdd={() => undefined} {...shellProps}>
       <Content>
         <HeaderRow>
           <div>
@@ -192,6 +195,8 @@ function App() {
             <FilterTitle>언어</FilterTitle>
             <Chip active={language === "ALL"} onClick={() => setLanguage("ALL")}>전체</Chip>
             <Chip active={language === "ENGLISH"} onClick={() => setLanguage("ENGLISH")}>영어</Chip>
+            <Chip active={language === "JAPANESE"} onClick={() => setLanguage("JAPANESE")}>일본어</Chip>
+            <Chip active={language === "KOREAN"} onClick={() => setLanguage("KOREAN")}>한국어</Chip>
           </FilterGroup>
           <FilterGroup>
             <FilterTitle>기간</FilterTitle>
@@ -552,4 +557,3 @@ const HelpButton = styled.button<{ mobile?: boolean }>`
 `;
 
 export default App;
-
