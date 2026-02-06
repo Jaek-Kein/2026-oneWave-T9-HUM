@@ -1,0 +1,270 @@
+{
+  "words": [
+    {
+      "id": 1,
+      "word": "Serendipity",
+      "meaning": "뜻밖의 행운",
+      "partOfSpeech": "명사",
+      "artist": "BTS",
+      "song": "Serendipity",
+      "frequency": 24,
+      "addedAt": "2025.03",
+      "language": "ENGLISH"
+    },
+    {
+      "id": 2,
+      "word": "Euphoria",
+      "meaning": "행복감",
+      "partOfSpeech": "명사",
+      "artist": "BTS",
+      "song": "Euphoria",
+      "frequency": 31,
+      "addedAt": "2025.03",
+      "language": "ENGLISH"
+    },
+    {
+      "id": 3,
+      "word": "Epiphany",
+      "meaning": "깨달음",
+      "partOfSpeech": "명사",
+      "artist": "BTS",
+      "song": "Epiphany",
+      "frequency": 18,
+      "addedAt": "2025.02",
+      "language": "ENGLISH"
+    },
+    {
+      "id": 4,
+      "word": "Persona",
+      "meaning": "겉으로 드러난 자아",
+      "partOfSpeech": "명사",
+      "artist": "RM",
+      "song": "Persona",
+      "frequency": 22,
+      "addedAt": "2025.02",
+      "language": "ENGLISH"
+    },
+    {
+      "id": 5,
+      "word": "Lonely",
+      "meaning": "외로운",
+      "partOfSpeech": "형용사",
+      "artist": "BTS",
+      "song": "The Truth Untold",
+      "frequency": 27,
+      "addedAt": "2025.01",
+      "language": "ENGLISH"
+    },
+    {
+      "id": 6,
+      "word": "Bloom",
+      "meaning": "꽃피다",
+      "partOfSpeech": "동사",
+      "artist": "IU",
+      "song": "Lilac",
+      "frequency": 21,
+      "addedAt": "2024.12",
+      "language": "ENGLISH"
+    },
+    {
+      "id": 7,
+      "word": "Paradise",
+      "meaning": "낙원",
+      "partOfSpeech": "명사",
+      "artist": "Coldplay",
+      "song": "Paradise",
+      "frequency": 38,
+      "addedAt": "2024.10",
+      "language": "ENGLISH"
+    },
+    {
+      "id": 8,
+      "word": "Unstoppable",
+      "meaning": "막을 수 없는",
+      "partOfSpeech": "형용사",
+      "artist": "Sia",
+      "song": "Unstoppable",
+      "frequency": 39,
+      "addedAt": "2024.07",
+      "language": "ENGLISH"
+    },
+
+    {
+      "id": 9,
+      "word": "愛",
+      "meaning": "사랑",
+      "partOfSpeech": "명사",
+      "artist": "宇多田ヒカル",
+      "song": "First Love",
+      "frequency": 42,
+      "addedAt": "2025.03",
+      "language": "JAPANESE"
+    },
+    {
+      "id": 10,
+      "word": "光",
+      "meaning": "빛",
+      "partOfSpeech": "명사",
+      "artist": "宇多田ヒカル",
+      "song": "Hikari",
+      "frequency": 29,
+      "addedAt": "2025.02",
+      "language": "JAPANESE"
+    },
+    {
+      "id": 11,
+      "word": "孤独",
+      "meaning": "고독",
+      "partOfSpeech": "명사",
+      "artist": "Aimer",
+      "song": "Ref:rain",
+      "frequency": 17,
+      "addedAt": "2025.02",
+      "language": "JAPANESE"
+    },
+    {
+      "id": 12,
+      "word": "夜",
+      "meaning": "밤",
+      "partOfSpeech": "명사",
+      "artist": "YOASOBI",
+      "song": "夜に駆ける",
+      "frequency": 36,
+      "addedAt": "2025.01",
+      "language": "JAPANESE"
+    },
+    {
+      "id": 13,
+      "word": "夢",
+      "meaning": "꿈",
+      "partOfSpeech": "명사",
+      "artist": "RADWIMPS",
+      "song": "夢灯籠",
+      "frequency": 25,
+      "addedAt": "2024.12",
+      "language": "JAPANESE"
+    },
+    {
+      "id": 14,
+      "word": "心",
+      "meaning": "마음",
+      "partOfSpeech": "명사",
+      "artist": "MISIA",
+      "song": "Everything",
+      "frequency": 33,
+      "addedAt": "2024.11",
+      "language": "JAPANESE"
+    },
+    {
+      "id": 15,
+      "word": "空",
+      "meaning": "하늘",
+      "partOfSpeech": "명사",
+      "artist": "King Gnu",
+      "song": "白日",
+      "frequency": 21,
+      "addedAt": "2024.10",
+      "language": "JAPANESE"
+    },
+    {
+      "id": 16,
+      "word": "希望",
+      "meaning": "희망",
+      "partOfSpeech": "명사",
+      "artist": "ONE OK ROCK",
+      "song": "Stand Out Fit In",
+      "frequency": 19,
+      "addedAt": "2024.09",
+      "language": "JAPANESE"
+    },
+
+    {
+      "id": 17,
+      "word": "사랑",
+      "meaning": "아끼고 소중히 여기는 마음",
+      "partOfSpeech": "명사",
+      "artist": "아이유",
+      "song": "사랑이 잘",
+      "frequency": 40,
+      "addedAt": "2025.03",
+      "language": "KOREAN"
+    },
+    {
+      "id": 18,
+      "word": "기억",
+      "meaning": "지난 일을 떠올림",
+      "partOfSpeech": "명사",
+      "artist": "폴킴",
+      "song": "모든 날, 모든 순간",
+      "frequency": 34,
+      "addedAt": "2025.02",
+      "language": "KOREAN"
+    },
+    {
+      "id": 19,
+      "word": "위로",
+      "meaning": "마음을 달램",
+      "partOfSpeech": "명사",
+      "artist": "이하이",
+      "song": "BREATHE",
+      "frequency": 28,
+      "addedAt": "2025.01",
+      "language": "KOREAN"
+    },
+    {
+      "id": 20,
+      "word": "시간",
+      "meaning": "흐르는 순간의 연속",
+      "partOfSpeech": "명사",
+      "artist": "AKMU",
+      "song": "시간과 낙엽",
+      "frequency": 31,
+      "addedAt": "2024.12",
+      "language": "KOREAN"
+    },
+    {
+      "id": 21,
+      "word": "청춘",
+      "meaning": "젊은 시절",
+      "partOfSpeech": "명사",
+      "artist": "김필",
+      "song": "청춘",
+      "frequency": 23,
+      "addedAt": "2024.11",
+      "language": "KOREAN"
+    },
+    {
+      "id": 22,
+      "word": "약속",
+      "meaning": "지키기로 한 말",
+      "partOfSpeech": "명사",
+      "artist": "10cm",
+      "song": "폰서트",
+      "frequency": 26,
+      "addedAt": "2024.10",
+      "language": "KOREAN"
+    },
+    {
+      "id": 23,
+      "word": "이별",
+      "meaning": "헤어짐",
+      "partOfSpeech": "명사",
+      "artist": "성시경",
+      "song": "희재",
+      "frequency": 35,
+      "addedAt": "2024.09",
+      "language": "KOREAN"
+    },
+    {
+      "id": 24,
+      "word": "기다림",
+      "meaning": "오기를 바람",
+      "partOfSpeech": "명사",
+      "artist": "윤하",
+      "song": "기다리다",
+      "frequency": 22,
+      "addedAt": "2024.08",
+      "language": "KOREAN"
+    }
+  ]
+}
