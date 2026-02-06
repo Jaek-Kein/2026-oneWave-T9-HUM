@@ -26,6 +26,10 @@ export default function LoginPage() {
     <Page>
       <Card>
         <Hero>
+          <HeroVideo autoPlay muted loop playsInline preload="metadata">
+            <source src="/HUM.mp4" type="video/mp4" />
+          </HeroVideo>
+          <HeroTint />
           <Brand>
             <BrandMark>
               <FiMusic size={15} />
@@ -126,15 +130,13 @@ const Card = styled.section`
 
 const Hero = styled.div`
   position: relative;
+  overflow: hidden;
   padding: 44px 48px 40px;
   color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(9, 245, 184, 0.26), transparent 35%),
-    radial-gradient(circle at 100% 30%, rgba(23, 230, 173, 0.2), transparent 45%),
-    linear-gradient(160deg, #041217 10%, #052229 45%, #053a34 100%);
+  background: #041217;
 
   &::before,
   &::after {
@@ -145,6 +147,7 @@ const Hero = styled.div`
     border-radius: 40% 60% 45% 55%;
     filter: blur(1px);
     opacity: 0.75;
+    z-index: 1;
     pointer-events: none;
   }
 
@@ -167,6 +170,24 @@ const Hero = styled.div`
     padding: 36px 32px 28px;
     justify-content: space-between;
   }
+`;
+
+const HeroVideo = styled.video`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+`;
+
+const HeroTint = styled.div`
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(9, 245, 184, 0.2), transparent 35%),
+    linear-gradient(160deg, rgba(4, 18, 23, 0.72) 10%, rgba(5, 34, 41, 0.58) 45%, rgba(5, 58, 52, 0.64) 100%);
+  z-index: 1;
 `;
 
 const Brand = styled.div`
