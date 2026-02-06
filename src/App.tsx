@@ -7,7 +7,7 @@ import {
   FiLoader,
   FiMusic,
 } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MobileShell from "./layout/MobileShell";
 import WebShell from "./layout/WebShell";
 import { useMediaQuery } from "./shared/hooks/useMediaQueryl";
@@ -22,6 +22,19 @@ type WordItem = {
   song: string;
   frequency: number;
   addedAt: string;
+  language: "ENGLISH" | "JAPANESE" | "KOREAN";
+};
+
+type TrackItem = {
+  id: number;
+  title: string;
+  artist: string;
+  capturedAt: string;
+  extractedWords: number;
+  source: string;
+  platform: "youtube" | "spotify" | "apple";
+  coverStart: string;
+  coverEnd: string;
 };
 
 const MOBILE_PAGE_SIZE = 3;
@@ -29,6 +42,7 @@ const MOBILE_PAGE_SIZE = 3;
 function App() {
   const isMobile = useMediaQuery("(max-width: 1023px)");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [desktopPage, setDesktopPage] = useState(1);
   const [mobileVisibleCount, setMobileVisibleCount] = useState(MOBILE_PAGE_SIZE);
   const [mobileLoading, setMobileLoading] = useState(false);
@@ -37,6 +51,7 @@ function App() {
 
   const {
     wordList,
+    trackList,
     query,
     sortType,
     language,
@@ -45,17 +60,70 @@ function App() {
     setSortType,
     setLanguage,
     fetchAppData,
-    getFilteredWords,
   } = useWordStore();
 
   useEffect(() => {
     fetchAppData();
   }, [fetchAppData]);
 
-  const visibleWords = useMemo(
-    () => getFilteredWords(),
-    [getFilteredWords, query, sortType, language, wordList],
-  );
+  const selectedTrackId = useMemo(() => {
+    const raw = searchParams.get("trackId");
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = Number(raw);
+    if (!Number.isInteger(parsed)) {
+      return null;
+    }
+
+    return parsed;
+  }, [searchParams]);
+
+  const selectedTrack = useMemo(() => {
+    if (selectedTrackId === null) {
+      return null;
+    }
+
+    return trackList.find((track) => track.id === selectedTrackId) ?? null;
+  }, [selectedTrackId, trackList]);
+
+  const trackScopedWords = useMemo(() => {
+    if (!selectedTrack) {
+      return wordList;
+    }
+
+    return wordList.filter((item) => wordBelongsToTrack(item, selectedTrack));
+  }, [selectedTrack, wordList]);
+
+  const visibleWords = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    let filtered = normalizedQuery
+      ? trackScopedWords.filter(
+          (item) =>
+            item.word.toLowerCase().includes(normalizedQuery) ||
+            item.meaning.toLowerCase().includes(normalizedQuery) ||
+            item.artist.toLowerCase().includes(normalizedQuery),
+        )
+      : trackScopedWords;
+
+    if (!selectedTrack && language !== "ALL") {
+      filtered = filtered.filter((item) => item.language === language);
+    }
+
+    if (sortType === "alphabet") {
+      return [...filtered].sort((a, b) => a.word.localeCompare(b.word));
+    }
+
+    if (sortType === "frequency") {
+      return [...filtered].sort((a, b) => b.frequency - a.frequency);
+    }
+
+    return [...filtered].sort((a, b) => b.addedAt.localeCompare(a.addedAt));
+  }, [trackScopedWords, query, selectedTrack, language, sortType]);
+
+  const totalWordCount = selectedTrack ? trackScopedWords.length : wordList.length;
 
   const desktopPageSize = 6;
   const totalDesktopPages = Math.max(1, Math.ceil(visibleWords.length / desktopPageSize));
@@ -64,7 +132,7 @@ function App() {
     setDesktopPage(1);
     setMobileVisibleCount(MOBILE_PAGE_SIZE);
     setMobileLoading(false);
-  }, [query, sortType, language, isMobile]);
+  }, [query, sortType, language, isMobile, selectedTrackId]);
 
   const safeDesktopPage = useMemo(() => {
     return Math.min(desktopPage, totalDesktopPages);
@@ -138,13 +206,21 @@ function App() {
   };
 
   return isMobile ? (
-    <MobileShell title="단어장 목록" totalCount={wordList.length} {...shellProps}>
-      <MobileToolbar>
-        <Chip active={language === "ALL"} onClick={() => setLanguage("ALL")}>전체</Chip>
-        <Chip active={language === "ENGLISH"} onClick={() => setLanguage("ENGLISH")}>영어</Chip>
-        <Chip active={language === "JAPANESE"} onClick={() => setLanguage("JAPANESE")}>일본어</Chip>
-        <Chip active={language === "KOREAN"} onClick={() => setLanguage("KOREAN")}>한국어</Chip>
-      </MobileToolbar>
+    <MobileShell
+      title={selectedTrack ? "단어장" : "단어장 목록"}
+      totalCount={totalWordCount}
+      {...shellProps}
+    >
+      {!selectedTrack ? (
+        <MobileToolbar>
+          <Chip active={language === "ALL"} onClick={() => setLanguage("ALL")}>전체</Chip>
+          <Chip active={language === "ENGLISH"} onClick={() => setLanguage("ENGLISH")}>영어</Chip>
+          <Chip active={language === "JAPANESE"} onClick={() => setLanguage("JAPANESE")}>일본어</Chip>
+          <Chip active={language === "KOREAN"} onClick={() => setLanguage("KOREAN")}>한국어</Chip>
+        </MobileToolbar>
+      ) : null}
+
+      {selectedTrack ? <TrackSummaryCard track={selectedTrack} mobile /> : null}
 
       <MobileSortTabs>
         <SortLabel>
@@ -185,24 +261,38 @@ function App() {
           <div>
             <Title>단어장</Title>
             <Subtitle>
-              노래 가사에서 수집한 단어를 학습해보세요. 총 <b>{wordList.length}</b>개의 단어가 등록되어 있습니다.
+              {selectedTrack ? (
+                <>
+                  선택한 트랙에서 추출된 단어입니다. 총 <b>{totalWordCount}</b>개의 단어가 저장되어 있습니다.
+                </>
+              ) : (
+                <>
+                  노래 가사에서 수집한 단어를 학습해보세요. 총 <b>{totalWordCount}</b>개의 단어가 등록되어 있습니다.
+                </>
+              )}
             </Subtitle>
           </div>
         </HeaderRow>
 
+        {selectedTrack ? <TrackSummaryCard track={selectedTrack} /> : null}
+
         <FilterRow>
-          <FilterGroup>
-            <FilterTitle>언어</FilterTitle>
-            <Chip active={language === "ALL"} onClick={() => setLanguage("ALL")}>전체</Chip>
-            <Chip active={language === "ENGLISH"} onClick={() => setLanguage("ENGLISH")}>영어</Chip>
-            <Chip active={language === "JAPANESE"} onClick={() => setLanguage("JAPANESE")}>일본어</Chip>
-            <Chip active={language === "KOREAN"} onClick={() => setLanguage("KOREAN")}>한국어</Chip>
-          </FilterGroup>
-          <FilterGroup>
-            <FilterTitle>기간</FilterTitle>
-            <Chip>최근 7일</Chip>
-            <Chip>최근 30일</Chip>
-          </FilterGroup>
+          {!selectedTrack ? (
+            <>
+              <FilterGroup>
+                <FilterTitle>언어</FilterTitle>
+                <Chip active={language === "ALL"} onClick={() => setLanguage("ALL")}>전체</Chip>
+                <Chip active={language === "ENGLISH"} onClick={() => setLanguage("ENGLISH")}>영어</Chip>
+                <Chip active={language === "JAPANESE"} onClick={() => setLanguage("JAPANESE")}>일본어</Chip>
+                <Chip active={language === "KOREAN"} onClick={() => setLanguage("KOREAN")}>한국어</Chip>
+              </FilterGroup>
+              <FilterGroup>
+                <FilterTitle>기간</FilterTitle>
+                <Chip>최근 7일</Chip>
+                <Chip>최근 30일</Chip>
+              </FilterGroup>
+            </>
+          ) : null}
           <SortSelect>
             <FiList size={16} />
             <span>정렬</span>
@@ -235,6 +325,40 @@ function App() {
       </Content>
       <HelpButton>?</HelpButton>
     </WebShell>
+  );
+}
+
+function wordBelongsToTrack(item: WordItem, track: TrackItem) {
+  const song = item.song.trim().toLowerCase();
+  const artist = item.artist.trim().toLowerCase();
+  const trackTitle = track.title.trim().toLowerCase();
+  const trackArtist = track.artist.trim().toLowerCase();
+
+  const isSongMatched = song === trackTitle || song.includes(trackTitle) || trackTitle.includes(song);
+  const isArtistMatched = artist === trackArtist || artist.includes(trackArtist) || trackArtist.includes(artist);
+
+  return isSongMatched && isArtistMatched;
+}
+
+function TrackSummaryCard(props: { track: TrackItem; mobile?: boolean }) {
+  const { track, mobile = false } = props;
+
+  return (
+    <SelectedTrackCard mobile={mobile}>
+      <SelectedTrackMain>
+        <SelectedCover style={{ background: `linear-gradient(135deg, ${track.coverStart}, ${track.coverEnd})` }}>
+          {track.title.slice(0, 2).toUpperCase()}
+        </SelectedCover>
+        <SelectedMeta>
+          <SelectedTitle>{track.title}</SelectedTitle>
+          <SelectedArtist>{track.artist}</SelectedArtist>
+          <SelectedInfo>
+            <span>캡처 {track.capturedAt}</span>
+            <b>단어 {track.extractedWords}개</b>
+          </SelectedInfo>
+        </SelectedMeta>
+      </SelectedTrackMain>
+    </SelectedTrackCard>
   );
 }
 
@@ -354,6 +478,76 @@ const SortSelect = styled.button`
   align-items: center;
   gap: 8px;
   cursor: pointer;
+`;
+
+const SelectedTrackCard = styled.article<{ mobile?: boolean }>`
+  border-radius: 14px;
+  background: ${({ theme }) => theme.color.surface};
+  border: 1px solid ${({ theme }) => theme.color.line};
+  box-shadow: ${({ theme }) => theme.shadow.sm};
+  padding: ${({ mobile }) => (mobile ? "14px" : "16px")};
+  margin-bottom: 14px;
+`;
+
+const SelectedTrackMain = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const SelectedCover = styled.div`
+  width: 78px;
+  height: 78px;
+  border-radius: 12px;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 15px;
+`;
+
+const SelectedMeta = styled.div`
+  min-width: 0;
+`;
+
+const SelectedTitle = styled.h2`
+  margin: 0;
+  font-size: 32px;
+
+  @media (max-width: 1023px) {
+    font-size: 22px;
+  }
+`;
+
+const SelectedArtist = styled.p`
+  margin: 3px 0 8px;
+  color: #75819a;
+  font-size: 18px;
+
+  @media (max-width: 1023px) {
+    font-size: 14px;
+  }
+`;
+
+const SelectedInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #8f9bb2;
+  font-size: 14px;
+
+  b {
+    color: ${({ theme }) => theme.color.blue};
+    font-size: 14px;
+  }
+
+  @media (max-width: 1023px) {
+    font-size: 12px;
+
+    b {
+      font-size: 12px;
+    }
+  }
 `;
 
 const WordGrid = styled.div<{ mobile?: boolean }>`

@@ -1,6 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import styled from "@emotion/styled";
 import { FiChevronDown, FiChevronLeft, FiChevronsRight, FiList } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import MobileShell from "../layout/MobileShell";
 import WebShell from "../layout/WebShell";
 import { useMediaQuery } from "../shared/hooks/useMediaQueryl";
@@ -13,6 +14,7 @@ const DESKTOP_PAGE_SIZE = 6;
 
 export default function TrackListPage() {
   const isMobile = useMediaQuery("(max-width: 1023px)");
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [desktopPage, setDesktopPage] = useState(1);
   const [mobileVisibleCount, setMobileVisibleCount] = useState(MOBILE_PAGE_SIZE);
@@ -90,7 +92,7 @@ export default function TrackListPage() {
 
       <TrackList mobile>
         {mobileTracks.map((track) => (
-          <TrackCard key={track.id} mobile>
+          <TrackCard key={track.id} mobile clickable onClick={() => navigate(`/words?trackId=${track.id}`)}>
             <TrackMain>
               <Cover style={{ background: `linear-gradient(135deg, ${track.coverStart}, ${track.coverEnd})` }}>
                 {track.title.slice(0, 2).toUpperCase()}
@@ -156,7 +158,7 @@ export default function TrackListPage() {
 
         <TrackList>
           {desktopTracks.map((track) => (
-            <TrackCard key={track.id}>
+            <TrackCard key={track.id} clickable onClick={() => navigate(`/words?trackId=${track.id}`)}>
               <TrackMain>
                 <Cover style={{ background: `linear-gradient(135deg, ${track.coverStart}, ${track.coverEnd})` }}>
                   {track.title.slice(0, 2).toUpperCase()}
@@ -179,7 +181,12 @@ export default function TrackListPage() {
                   <TrackMeta>
                     <span>캡처 {track.capturedAt}</span>
                     <b>단어 {track.extractedWords}개</b>
-                    <Source href={track.source}>소스 링크</Source>
+                    <Source
+                      href={track.source}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      소스 링크
+                    </Source>
                   </TrackMeta>
                 </MetaBlock>
               </TrackMain>
@@ -314,12 +321,13 @@ const TrackList = styled.div<{ mobile?: boolean }>`
   gap: ${({ mobile }) => (mobile ? "12px" : "10px")};
 `;
 
-const TrackCard = styled.article<{ mobile?: boolean }>`
+const TrackCard = styled.article<{ mobile?: boolean; clickable?: boolean }>`
   border-radius: 14px;
   background: ${({ theme }) => theme.color.surface};
   border: 1px solid ${({ theme }) => theme.color.line};
   box-shadow: ${({ theme }) => theme.shadow.sm};
   padding: ${({ mobile }) => (mobile ? "16px" : "14px")};
+  cursor: ${({ clickable }) => (clickable ? "pointer" : "default")};
 `;
 
 const TrackMain = styled.div`
