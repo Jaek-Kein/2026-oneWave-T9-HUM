@@ -1,7 +1,14 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import styled from "@emotion/styled";
-import { FiChevronDown, FiChevronLeft, FiChevronsRight, FiList } from "react-icons/fi";
+import {
+  FiChevronDown,
+  FiChevronLeft,
+  FiChevronsRight,
+  FiList,
+  FiLoader,
+} from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { useCallback, useRef } from "react";
 import MobileShell from "../layout/MobileShell";
 import WebShell from "../layout/WebShell";
 import { useMediaQuery } from "../shared/hooks/useMediaQueryl";
@@ -10,7 +17,7 @@ import { useWordStore } from "../store/useWordStore";
 type Platform = "youtube" | "spotify" | "apple";
 
 const MOBILE_PAGE_SIZE = 4;
-const DESKTOP_PAGE_SIZE = 6;
+const DESKTOP_PAGE_SIZE = 4;
 
 export default function TrackListPage() {
   const isMobile = useMediaQuery("(max-width: 1023px)");
@@ -18,6 +25,9 @@ export default function TrackListPage() {
   const [query, setQuery] = useState("");
   const [desktopPage, setDesktopPage] = useState(1);
   const [mobileVisibleCount, setMobileVisibleCount] = useState(MOBILE_PAGE_SIZE);
+  const [mobileLoading, setMobileLoading] = useState(false);
+  const mobileLoadTimerRef = useRef<number | null>(null);
+  const mobileLoadAnchorRef = useRef<HTMLDivElement | null>(null);
 
   const {
     trackList,
@@ -42,6 +52,7 @@ export default function TrackListPage() {
   useEffect(() => {
     setDesktopPage(1);
     setMobileVisibleCount(MOBILE_PAGE_SIZE);
+    setMobileLoading(false);
   }, [query, trackPlatformFilter, trackSortType, isMobile]);
 
   const totalDesktopPages = Math.max(1, Math.ceil(visibleTracks.length / DESKTOP_PAGE_SIZE));
@@ -51,6 +62,59 @@ export default function TrackListPage() {
   const desktopTracks = visibleTracks.slice(desktopStart, desktopStart + DESKTOP_PAGE_SIZE);
   const mobileTracks = visibleTracks.slice(0, mobileVisibleCount);
   const hasMoreMobile = mobileVisibleCount < visibleTracks.length;
+
+  useEffect(() => {
+    return () => {
+      if (mobileLoadTimerRef.current !== null) {
+        window.clearTimeout(mobileLoadTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleLoadMoreMobile = useCallback(() => {
+    if (mobileLoading || !hasMoreMobile) {
+      return;
+    }
+
+    setMobileLoading(true);
+    if (mobileLoadTimerRef.current !== null) {
+      window.clearTimeout(mobileLoadTimerRef.current);
+    }
+    mobileLoadTimerRef.current = window.setTimeout(() => {
+      setMobileVisibleCount((prev) =>
+        Math.min(prev + MOBILE_PAGE_SIZE, visibleTracks.length),
+      );
+      setMobileLoading(false);
+    }, 380);
+  }, [hasMoreMobile, mobileLoading, visibleTracks.length]);
+
+  useEffect(() => {
+    if (!isMobile || !hasMoreMobile || mobileLoading) {
+      return;
+    }
+
+    const anchor = mobileLoadAnchorRef.current;
+    if (!anchor) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry?.isIntersecting) {
+          handleLoadMoreMobile();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "120px 0px",
+        threshold: 0.01,
+      },
+    );
+
+    observer.observe(anchor);
+    return () => observer.disconnect();
+  }, [handleLoadMoreMobile, hasMoreMobile, isMobile, mobileLoading]);
 
   const shellProps = {
     query,
@@ -116,12 +180,22 @@ export default function TrackListPage() {
       <Pagination mobile>
         <LoadMoreButton
           type="button"
-          onClick={() => setMobileVisibleCount((prev) => Math.min(prev + MOBILE_PAGE_SIZE, visibleTracks.length))}
-          disabled={!hasMoreMobile}
+          onClick={handleLoadMoreMobile}
+          disabled={!hasMoreMobile || mobileLoading}
         >
-          {hasMoreMobile ? "더 보기" : "모든 트랙을 불러왔습니다"}
+          {mobileLoading ? (
+            <>
+              <LoadingIcon size={15} />
+              불러오는 중...
+            </>
+          ) : hasMoreMobile ? (
+            "더 보기"
+          ) : (
+            "모든 트랙을 불러왔습니다"
+          )}
         </LoadMoreButton>
       </Pagination>
+      <MobileLoadAnchor ref={mobileLoadAnchorRef} aria-hidden />
     </MobileShell>
   ) : (
     <WebShell userName={user.name} {...shellProps}>
@@ -194,7 +268,7 @@ export default function TrackListPage() {
           ))}
         </TrackList>
 
-        <Pagination>
+        <Pagination desktopSticky>
           <PageBtn icon onClick={() => setDesktopPage((prev) => Math.max(1, prev - 1))} disabled={safeDesktopPage === 1}>
             <FiChevronLeft size={18} />
           </PageBtn>
@@ -445,11 +519,22 @@ const Source = styled.a`
   white-space: nowrap;
 `;
 
-const Pagination = styled.div<{ mobile?: boolean }>`
+const Pagination = styled.div<{ mobile?: boolean; desktopSticky?: boolean }>`
   margin: ${({ mobile }) => (mobile ? "24px 0 112px" : "14px 0 0")};
   display: flex;
   justify-content: center;
   gap: 10px;
+
+  ${({ desktopSticky, mobile, theme }) =>
+    desktopSticky && !mobile
+      ? `
+    position: sticky;
+    bottom: 0;
+    padding-top: 10px;
+    background: ${theme.color.bg};
+    z-index: 2;
+  `
+      : ""}
 `;
 
 const PageBtn = styled.button<{ active?: boolean; icon?: boolean }>`
@@ -475,12 +560,35 @@ const LoadMoreButton = styled.button`
   background: ${({ theme }) => theme.color.surface};
   color: #5f6d87;
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
   cursor: pointer;
 
   &:disabled {
     opacity: 0.65;
     cursor: default;
   }
+`;
+
+const LoadingIcon = styled(FiLoader)`
+  animation: spin 0.85s linear infinite;
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const MobileLoadAnchor = styled.div`
+  width: 100%;
+  height: 1px;
 `;
 
 const MobileToolbar = styled.div`
