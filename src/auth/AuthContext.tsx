@@ -1,10 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { isAuthenticated, signInBypass, signOut } from "./auth";
+import { isAuthenticated, setToken, signInBypass, signOut } from "./auth";
 
 type AuthContextValue = {
   isLoggedIn: boolean;
   loginBypass: () => void;
   logout: () => void;
+  setAuthFromCallback: (token: string) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -22,13 +23,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(false);
   }, []);
 
+  const setAuthFromCallback = useCallback((token: string) => {
+    setToken(token);
+    setIsLoggedIn(true);
+  }, []);
+
   useEffect(() => {
-    const handleStorage = () => {
-      setIsLoggedIn(isAuthenticated());
-    };
+    const handleStorage = () => setIsLoggedIn(isAuthenticated());
+    const handleUnauthorized = () => setIsLoggedIn(false);
 
     window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    window.addEventListener("onewave:unauthorized" as never, handleUnauthorized);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("onewave:unauthorized" as never, handleUnauthorized);
+    };
   }, []);
 
   const value = useMemo(
@@ -36,8 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoggedIn,
       loginBypass,
       logout,
+      setAuthFromCallback,
     }),
-    [isLoggedIn, loginBypass, logout],
+    [isLoggedIn, loginBypass, logout, setAuthFromCallback],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "@emotion/styled";
 import { FiChevronDown, FiChevronLeft, FiChevronsRight, FiList } from "react-icons/fi";
 import MobileShell from "../layout/MobileShell";
